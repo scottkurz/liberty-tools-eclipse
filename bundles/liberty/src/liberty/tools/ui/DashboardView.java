@@ -150,14 +150,6 @@ public class DashboardView extends ViewPart {
         };
         startAction.setImageDescriptor(ActionImg);
 
-        // Menu: Start with parameters.
-        startWithParmAction = new Action("Start...") {
-            @Override
-            public void run() {
-                devMode.startWithParms();
-            }
-        };
-        startWithParmAction.setImageDescriptor(ActionImg);
 
         // Menu: Start in container.
         startInContanerAction = new Action("Start in container") {
