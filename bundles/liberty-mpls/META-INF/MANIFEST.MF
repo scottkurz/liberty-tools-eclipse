@@ -5,6 +5,7 @@ Bundle-SymbolicName: liberty-mpls;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Automatic-Module-Name: liberty-mpls
 Bundle-RequiredExecutionEnvironment: JavaSE-11
+Export-Package: liberty.tools.mpls
 Require-Bundle: org.eclipse.lsp4mp.jdt.core,
  org.eclipse.lsp4e,
  org.eclipse.ui,
