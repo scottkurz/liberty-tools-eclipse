@@ -23,23 +23,6 @@
           <useUIThread>false</useUIThread>
         </configuration>
       </plugin>
-                 <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                    <executions>
-                        <execution>
-                            <id>get-server</id>
-                            <goals>
-                                <goal>copy-dependencies</goal>
-                            </goals>
-                            <phase>generate-resources</phase>
-                            <configuration>
-                                <classifier>uber</classifier>
-                                <outputDirectory>${basedir}/server/</outputDirectory>  
-                            </configuration>		
-                        </execution>    
-                    </executions>    
-              </plugin> 
     </plugins>
   </build>
 
