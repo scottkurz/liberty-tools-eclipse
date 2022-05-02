@@ -18,14 +18,14 @@ public class LibertyMPLSJavaHoverTest extends MicroProfileConfigJavaHoverTest {
 	
 	@Override
 	@Test
-	@Ignore
+	@Ignore (value = "not working for some reason in the lsp4mp test bucket")
 	public void configPropertyNamePrecedence() throws Exception {
 		
 	}
 	
 	@Override
 	@Test
-	@Ignore
+	@Ignore (value = "not working for some reason in the lsp4mp test bucket")
 	public void configPropertyNameProfile() throws Exception {
 	}
 }
