@@ -57,7 +57,7 @@ public class Workspace {
      *
      * @return All open projects currently in the workspace.
      */
-    public static List<IProject> getOpenWokspaceProjects() {
+    public static List<IProject> getOpenWorkspaceProjects() {
         List<IProject> jProjects = new ArrayList<IProject>();
 
         IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
@@ -86,7 +86,7 @@ public class Workspace {
      */
     public static List<String> getLibertyProjects(boolean refresh) throws Exception {
         ArrayList<String> libertyProjects = new ArrayList<String>();
-        List<IProject> projectList = getOpenWokspaceProjects();
+        List<IProject> projectList = getOpenWorkspaceProjects();
         Iterator<IProject> projects = projectList.iterator();
         while (projects.hasNext()) {
             IProject project = projects.next();
