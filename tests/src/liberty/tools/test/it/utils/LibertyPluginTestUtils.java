@@ -32,6 +32,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.junit.jupiter.api.Assertions;
 
+import liberty.tools.DevModeOperations;
+
 /**
  * Tests Open Liberty Eclipse plugin functions.
  */
@@ -151,6 +153,18 @@ public class LibertyPluginTestUtils {
 
         // If we are here, the expected outcome was not found.
         Assertions.fail("Timed out while waiting for test report: " + pathToTestReport + " to become available.");
+    }
+    
+    /**
+     * Validates that the deployed application is active.
+     *
+     * @param expectSuccess True if the validation is expected to be successful. False, otherwise.
+     */
+    public static void validateStartWithParamString(String appName, boolean expectSuccess, String testAppPath, String user_params) {
+    	String expected_maven_cmd = getMavenCommand(testAppPath, user_params + " io.openliberty.tools:liberty-maven-plugin:dev -f " + testAppPath);
+    	String submitted_cmd = DevModeOperations.getStartCmdWithParamsString();
+    	
+    	Assertions.assertEquals(submitted_cmd, expected_maven_cmd);
     }
 
     /**
@@ -277,5 +291,66 @@ public class LibertyPluginTestUtils {
             }
         }
         return file.delete();
+    }
+    
+    private static String getMavenCommand(String projectPath, String cmdArgs) {
+        String baseCmd = null;
+        String mvnCmd = null;
+
+        // 1. Check if there is wrapper defined.
+        Path p2mw = (onWindows()) ? Paths.get(projectPath, "mvnw.cmd") : Paths.get(projectPath, "mvnw");
+        Path p2mwJar = Paths.get(projectPath, ".mvn", "wrapper", "maven-wrapper.jar");
+        Path p2mwProps = Paths.get(projectPath, ".mvn", "wrapper", "maven-wrapper.properties");
+
+        if (p2mw.toFile().exists() && p2mwJar.toFile().exists() && p2mwProps.toFile().exists()) {
+            mvnCmd = p2mw.toString();
+        } else {
+            baseCmd = onWindows() ? "mvn.cmd" : "mvn";
+        }
+
+        // 2. Check if an environment variable was defined to point to the Maven installation.
+        if (mvnCmd == null) {
+            String mvnInstallPath = getMavenInstallHome();
+            if (mvnInstallPath != null) {
+                mvnCmd = Paths.get(mvnInstallPath, "bin", baseCmd).toString();
+            }
+        }
+
+        // 3. Use the base command.
+        if (mvnCmd == null) {
+            mvnCmd = baseCmd;
+        }
+
+        // Put it all together.
+        StringBuilder sb = new StringBuilder();
+        sb.append(mvnCmd).append(" ").append(cmdArgs);
+
+        if (onWindows()) {
+            // Include trailing space for separation
+            sb.insert(0, "/c ");
+        }
+
+        return sb.toString();
+    }
+    
+    /**
+     * Returns the home path to the Maven installation.
+     *
+     * @return The home path to the Maven installation, or null if not found.
+     */
+    private static String getMavenInstallHome() {
+        String mvnInstall = null;
+        // TODO: 1. Find the eclipse->maven configured install path
+
+        // 2. Check for associated environment variable.
+        if (mvnInstall == null) {
+            mvnInstall = System.getenv("MAVEN_HOME");
+
+            if (mvnInstall == null) {
+                mvnInstall = System.getenv("M2_MAVEN");
+            }
+        }
+
+        return mvnInstall;
     }
 }

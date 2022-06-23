@@ -269,6 +269,42 @@ public class LibertyPluginSWTBotMavenTest {
         // Close the terminal.
         terminal.close();
     }
+    
+    /**
+     * Tests the start with parameters command string for proper composition.
+     */
+    @Test
+    public void testStartWithParmsString() {
+        Path pathToITReport = DevModeOperations.getMavenIntegrationTestReportPath(projectPath.toString());
+        boolean testReportDeleted = deleteFile(pathToITReport.toFile());
+        Assertions.assertTrue(testReportDeleted, () -> "File: " + pathToITReport + " was not be deleted.");
+
+        // Start dev mode with parms.
+        String userParms = "clean -DhotTests=true";
+        SWTPluginOperations.launchAppMenuStartWithParmsAction(bot, dashboard, MVN_APP_NAME, userParms);
+        
+        // Validate the start command is properly composed.
+        validateStartWithParamString(MVN_APP_NAME, true, projectPath.toAbsolutePath().toString(), userParms);
+        
+        SWTBotView terminal = bot.viewByTitle("Terminal");
+        terminal.show();
+
+        // Validate application is up and running.
+        validateApplicationOutcome(MVN_APP_NAME, true, projectPath.toAbsolutePath().toString() + "/target/liberty");
+
+        // Validate that the test reports were generated.
+        validateTestReportExists(pathToITReport);
+
+        // Stop dev mode.
+        SWTPluginOperations.launchAppMenuStopAction(bot, dashboard, MVN_APP_NAME);
+        terminal.show();
+
+        // Validate application stopped.
+        validateApplicationOutcome(MVN_APP_NAME, false, projectPath.toAbsolutePath().toString() + "/target/liberty");
+
+        // Close the terminal.
+        terminal.close();
+    }
 
     /**
      * Tests the "Run Tests" menu action and test report view actions if internal browser support is available.
