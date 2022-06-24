@@ -12,6 +12,15 @@
 *******************************************************************************/
 package liberty.tools.test.it;
 
+import static liberty.tools.test.it.utils.LibertyPluginTestUtils.deleteFile;
+import static liberty.tools.test.it.utils.LibertyPluginTestUtils.isInternalBrowserSupportAvailable;
+import static liberty.tools.test.it.utils.LibertyPluginTestUtils.isTextInFile;
+import static liberty.tools.test.it.utils.LibertyPluginTestUtils.onWindows;
+import static liberty.tools.test.it.utils.LibertyPluginTestUtils.updateJVMEnvVariableCache;
+import static liberty.tools.test.it.utils.LibertyPluginTestUtils.validateApplicationOutcome;
+import static liberty.tools.test.it.utils.LibertyPluginTestUtils.validateStartWithParamString;
+import static liberty.tools.test.it.utils.LibertyPluginTestUtils.validateTestReportExists;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryNotEmptyException;
@@ -26,6 +35,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -50,8 +62,7 @@ import org.junit.jupiter.api.TestInfo;
 import liberty.tools.DevModeOperations;
 import liberty.tools.test.it.utils.SWTPluginOperations;
 import liberty.tools.ui.DashboardView;
-
-import static liberty.tools.test.it.utils.LibertyPluginTestUtils.*;
+import liberty.tools.utils.Project;
 
 /**
  * Tests Open Liberty Eclipse plugin functions.
@@ -148,6 +159,7 @@ public class LibertyPluginSWTBotMavenTest {
                 () -> "Maven application " + MVN_APP_NAME + " does not contain the expected menu items: " + mvnMenuItems);
     }
 
+    
     /**
      * Tests the start menu action on a dashboard listed application.
      */
@@ -515,4 +527,18 @@ public class LibertyPluginSWTBotMavenTest {
         boolean mvnDirDeleted = deleteFile(mvnDir.toFile());
         Assertions.assertTrue(mvnDirDeleted, () -> "File: " + mvnDir + " was not be deleted.");
     }
+    
+    @Test
+    public void testMavenImportProjIsMaven() throws IOException, InterruptedException {
+    	
+    	IWorkspace workspace = ResourcesPlugin.getWorkspace();
+        IWorkspaceRoot root = workspace.getRoot();
+        String projectName = MVN_APP_NAME;
+        IProject proj = root.getProject(projectName);
+        
+        Assertions.assertTrue(Project.isMaven(proj));
+    }
+ 
+    	
+    
 }
