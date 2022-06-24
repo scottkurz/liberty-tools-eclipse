@@ -10,6 +10,7 @@ Require-Bundle: org.junit.jupiter.api;bundle-version="[5.8.0,6.0.0)",
  org.hamcrest.library;bundle-version="[1.3.0,2.2)"
 Import-Package: liberty.tools,
  liberty.tools.ui,
+ liberty.tools.utils,
  org.eclipse.core.resources,
  org.eclipse.core.runtime,
  org.eclipse.m2e.core,
