@@ -72,7 +72,7 @@ public class DevModeOperations {
      */
     private ProjectTabController projectTabController;
     
-    private String previousPathString;
+    private String pathString;
     private String mvnCmd;
     private String gradleCmd;
 
@@ -88,9 +88,9 @@ public class DevModeOperations {
 			gradleCmd = "gradle.bat";
 		}
 		else {
-			previousPathString = System.getenv("PATH");
-			mvnCmd = getCmdInstallLocation(previousPathString, "mvn");
-			gradleCmd = getCmdInstallLocation(previousPathString, "gradle");
+			pathString = System.getenv("PATH");
+			mvnCmd = getCmdInstallLocation(pathString, "mvn");
+			gradleCmd = getCmdInstallLocation(pathString, "gradle");
 		}
         
     }
@@ -100,7 +100,7 @@ public class DevModeOperations {
      *
      * @return True if the underlying OS is windows. False, otherwise.
      */
-    private boolean isWindows() {
+    public boolean isWindows() {
         return System.getProperty("os.name").contains("Windows");
     }
 
@@ -165,9 +165,9 @@ public class DevModeOperations {
             // Prepare the Liberty plugin dev mode command.
             String cmd = "";
             if (Project.isMaven(project)) {
-                cmd = getMavenCommand(projectPath, "io.openliberty.tools:liberty-maven-plugin:dev -f " + projectPath);
+                cmd = getMavenCommand(projectPath, "io.openliberty.tools:liberty-maven-plugin:dev -f " + projectPath, pathString);
             } else if (Project.isGradle(project)) {
-                cmd = getGradleCommand(projectPath, "libertyDev -p=" + projectPath);
+                cmd = getGradleCommand(projectPath, "libertyDev -p=" + projectPath, pathString);
             } else {
                 throw new Exception("Project" + projectName + "is not a Gradle or Maven project.");
             }
@@ -259,9 +259,9 @@ public class DevModeOperations {
             // Prepare the Liberty plugin dev mode command.
             String cmd = "";
             if (Project.isMaven(project)) {
-                cmd = getMavenCommand(projectPath, "io.openliberty.tools:liberty-maven-plugin:dev " + userParms + " -f " + projectPath);
+                cmd = getMavenCommand(projectPath, "io.openliberty.tools:liberty-maven-plugin:dev " + userParms + " -f " + projectPath, pathString);
             } else if (Project.isGradle(project)) {
-                cmd = getGradleCommand(projectPath, "libertyDev " + userParms + " -p=" + projectPath);
+                cmd = getGradleCommand(projectPath, "libertyDev " + userParms + " -p=" + projectPath, pathString);
             } else {
                 throw new Exception("Project" + projectName + "is not a Gradle or Maven project.");
             }
@@ -345,9 +345,9 @@ public class DevModeOperations {
             // Prepare the Liberty plugin container dev mode command.
             String cmd = "";
             if (Project.isMaven(project)) {
-                cmd = getMavenCommand(projectPath, "io.openliberty.tools:liberty-maven-plugin:devc -f " + projectPath);
+                cmd = getMavenCommand(projectPath, "io.openliberty.tools:liberty-maven-plugin:devc -f " + projectPath, pathString);
             } else if (Project.isGradle(project)) {
-                cmd = getGradleCommand(projectPath, "libertyDevc -p=" + projectPath);
+                cmd = getGradleCommand(projectPath, "libertyDevc -p=" + projectPath, pathString);
             } else {
                 throw new Exception("Project" + projectName + "is not a Gradle or Maven project.");
             }
@@ -837,7 +837,7 @@ public class DevModeOperations {
      *
      * @return The full Maven command to run on the terminal.
      */
-    private String getMavenCommand(String projectPath, String cmdArgs) {
+    public String getMavenCommand(String projectPath, String cmdArgs, String systemPath) {
         String mvnWrapperCmd = null;
 
         // Check if there is wrapper defined.
@@ -853,12 +853,7 @@ public class DevModeOperations {
 
 				// On mac and linux, get the system PATH setting and check if it has been
 				// changed
-				String currentPath = System.getenv("PATH");
-				if (!currentPath.equals(previousPathString)) {
-					// if changed, process it for a potentially new maven command location
-					previousPathString = currentPath;
-					mvnCmd = getCmdInstallLocation(previousPathString, "mvn");
-				}
+				mvnCmd = getCmdInstallLocation(systemPath, "mvn");
 			}
 		}
         
@@ -887,7 +882,7 @@ public class DevModeOperations {
      *
      * @return The full Gradle command to run on the terminal.
      */
-    private String getGradleCommand(String projectPath, String cmdArgs) {
+    public String getGradleCommand(String projectPath, String cmdArgs, String systemPath) {
 
         String gradleWrapperCmd = null;
 
@@ -903,14 +898,7 @@ public class DevModeOperations {
 			// no wrapper defined, use the system gradle installation
 			if (!isWindows()) {
 
-				// On mac and linux, get the system PATH setting and check if it has been
-				// changed
-				String currentPath = System.getenv("PATH");
-				if (!currentPath.equals(previousPathString)) {
-					// if changed, process it for a potentially new maven command location
-					previousPathString = currentPath;
-					gradleCmd = getCmdInstallLocation(previousPathString, "gradle");
-				}
+				gradleCmd = getCmdInstallLocation(systemPath, "gradle");
 			}
 		}
 
@@ -931,7 +919,7 @@ public class DevModeOperations {
         return sb.toString();
     }
     
-    private String getCmdInstallLocation(String path, String cmd) {
+    public String getCmdInstallLocation(String path, String cmd) {
     	
     	String foundCmd = null;
     	
