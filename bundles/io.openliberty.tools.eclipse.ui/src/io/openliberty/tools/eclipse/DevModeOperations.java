@@ -72,27 +72,14 @@ public class DevModeOperations {
      */
     private ProjectTabController projectTabController;
     
-    private String pathString;
-    private String mvnCmd;
-    private String gradleCmd;
+    private String pathEnv;
 
     /**
      * Constructor.
      */
     public DevModeOperations() {
         projectTabController = ProjectTabController.getInstance();
-        // prepare the mvn and gradle commands
-        
-        if (isWindows()) {
-			mvnCmd = "mvn.cmd";
-			gradleCmd = "gradle.bat";
-		}
-		else {
-			pathString = System.getenv("PATH");
-			mvnCmd = getCmdInstallLocation(pathString, "mvn");
-			gradleCmd = getCmdInstallLocation(pathString, "gradle");
-		}
-        
+        pathEnv = System.getenv("PATH");
     }
 
     /**
@@ -165,9 +152,9 @@ public class DevModeOperations {
             // Prepare the Liberty plugin dev mode command.
             String cmd = "";
             if (Project.isMaven(project)) {
-                cmd = getMavenCommand(projectPath, "io.openliberty.tools:liberty-maven-plugin:dev -f " + projectPath, pathString);
+                cmd = getMavenCommand(projectPath, "io.openliberty.tools:liberty-maven-plugin:dev -f " + projectPath);
             } else if (Project.isGradle(project)) {
-                cmd = getGradleCommand(projectPath, "libertyDev -p=" + projectPath, pathString);
+                cmd = getGradleCommand(projectPath, "libertyDev -p=" + projectPath);
             } else {
                 throw new Exception("Project" + projectName + "is not a Gradle or Maven project.");
             }
@@ -259,9 +246,9 @@ public class DevModeOperations {
             // Prepare the Liberty plugin dev mode command.
             String cmd = "";
             if (Project.isMaven(project)) {
-                cmd = getMavenCommand(projectPath, "io.openliberty.tools:liberty-maven-plugin:dev " + userParms + " -f " + projectPath, pathString);
+                cmd = getMavenCommand(projectPath, "io.openliberty.tools:liberty-maven-plugin:dev " + userParms + " -f " + projectPath);
             } else if (Project.isGradle(project)) {
-                cmd = getGradleCommand(projectPath, "libertyDev " + userParms + " -p=" + projectPath, pathString);
+                cmd = getGradleCommand(projectPath, "libertyDev " + userParms + " -p=" + projectPath);
             } else {
                 throw new Exception("Project" + projectName + "is not a Gradle or Maven project.");
             }
@@ -345,9 +332,9 @@ public class DevModeOperations {
             // Prepare the Liberty plugin container dev mode command.
             String cmd = "";
             if (Project.isMaven(project)) {
-                cmd = getMavenCommand(projectPath, "io.openliberty.tools:liberty-maven-plugin:devc -f " + projectPath, pathString);
+                cmd = getMavenCommand(projectPath, "io.openliberty.tools:liberty-maven-plugin:devc -f " + projectPath);
             } else if (Project.isGradle(project)) {
-                cmd = getGradleCommand(projectPath, "libertyDevc -p=" + projectPath, pathString);
+                cmd = getGradleCommand(projectPath, "libertyDevc -p=" + projectPath);
             } else {
                 throw new Exception("Project" + projectName + "is not a Gradle or Maven project.");
             }
@@ -837,43 +824,23 @@ public class DevModeOperations {
      *
      * @return The full Maven command to run on the terminal.
      */
-    public String getMavenCommand(String projectPath, String cmdArgs, String systemPath) {
-        String mvnWrapperCmd = null;
+    public String getMavenCommand(String projectPath, String cmdArgs) {
+        String cmd = null;
 
         // Check if there is wrapper defined.
-		Path p2mw = (isWindows()) ? Paths.get(projectPath, "mvnw.cmd") : Paths.get(projectPath, "mvnw");
-		Path p2mwJar = Paths.get(projectPath, ".mvn", "wrapper", "maven-wrapper.jar");
-		Path p2mwProps = Paths.get(projectPath, ".mvn", "wrapper", "maven-wrapper.properties");
+        Path p2mw = (isWindows()) ? Paths.get(projectPath, "mvnw.cmd") : Paths.get(projectPath, "mvnw");
+        Path p2mwJar = Paths.get(projectPath, ".mvn", "wrapper", "maven-wrapper.jar");
+        Path p2mwProps = Paths.get(projectPath, ".mvn", "wrapper", "maven-wrapper.properties");
 
-		if (p2mw.toFile().exists() && p2mwJar.toFile().exists() && p2mwProps.toFile().exists()) {
-			mvnWrapperCmd = p2mw.toString();
-		} else {
-			// no wrapper defined, use the system mvn installation
-			if (!isWindows()) {
-
-				// On mac and linux, get the system PATH setting and check if it has been
-				// changed
-				mvnCmd = getCmdInstallLocation(systemPath, "mvn");
-			}
-		}
-        
-        // Put it all together.
-        StringBuilder sb = new StringBuilder();
-        if (mvnWrapperCmd != null) {
-        	sb.append(mvnWrapperCmd).append(" ").append(cmdArgs);
-        }
-        else {
-        	sb.append(mvnCmd).append(" ").append(cmdArgs);
+        if (p2mw.toFile().exists() && p2mwJar.toFile().exists() && p2mwProps.toFile().exists()) {
+            cmd = p2mw.toString();
+        } else {
+            cmd = getCmdFromPath(isWindows() ? "mvn.cmd" : "mvn");
         }
         
-        if (isWindows()) {
-            // Include trailing space for separation
-            sb.insert(0, "/c ");
-        }
-
-        return sb.toString();
+        return getCommandFromArgs(cmd, cmdArgs);
     }
-
+    
     /**
      * Returns the full Gradle command to run on the terminal.
      *
@@ -882,58 +849,58 @@ public class DevModeOperations {
      *
      * @return The full Gradle command to run on the terminal.
      */
-    public String getGradleCommand(String projectPath, String cmdArgs, String systemPath) {
+    public String getGradleCommand(String projectPath, String cmdArgs) {
 
-        String gradleWrapperCmd = null;
+        String cmd = null;
 
+        // Check if there is wrapper defined.
+        Path p2gw = (isWindows()) ? Paths.get(projectPath, "gradlew.bat") : Paths.get(projectPath, "gradlew");
+        Path p2gwJar = Paths.get(projectPath, "gradle", "wrapper", "gradle-wrapper.jar");
+        Path p2gwProps = Paths.get(projectPath, "gradle", "wrapper", "gradle-wrapper.properties");
 
-		// Check if there is wrapper defined.
-		Path p2gw = (isWindows()) ? Paths.get(projectPath, "gradlew.cmd") : Paths.get(projectPath, "gradlew");
-		Path p2gwJar = Paths.get(projectPath, "gradle", "wrapper", "gradle-wrapper.jar");
-		Path p2gwProps = Paths.get(projectPath, "gradle", "wrapper", "gradle-wrapper.properties");
+        if (p2gw.toFile().exists() && p2gwJar.toFile().exists() && p2gwProps.toFile().exists()) {
+            cmd = p2gw.toString();
+        } else {
+            cmd = getCmdFromPath(isWindows() ? "gradle.bat" : "gradle");
+        }
 
-		if (p2gw.toFile().exists() && p2gwJar.toFile().exists() && p2gwProps.toFile().exists()) {
-			gradleWrapperCmd = p2gw.toString();
-		} else {
-			// no wrapper defined, use the system gradle installation
-			if (!isWindows()) {
+        return getCommandFromArgs(cmd, cmdArgs);
+    }
+    
 
-				gradleCmd = getCmdInstallLocation(systemPath, "gradle");
-			}
-		}
-
+    private String getCommandFromArgs(String cmd, String cmdArgs) {
         // Put it all together.
         StringBuilder sb = new StringBuilder();
-        if (gradleWrapperCmd != null) {
-        	sb.append(gradleWrapperCmd).append(" ").append(cmdArgs);
+        if (cmd != null) {
+            sb.append(cmd).append(" ").append(cmdArgs);
+            if (isWindows()) {
+                // Include trailing space for separation
+                sb.insert(0, "/c ");
+            }
         }
-        else {
-        	sb.append(gradleCmd).append(" ").append(cmdArgs);
-        }
-
-        if (isWindows()) {
-            // Include trailing space for separation
-            sb.insert(0, "/c ");
-        }
-
+        
         return sb.toString();
     }
     
-    public String getCmdInstallLocation(String path, String cmd) {
-    	
-    	String foundCmd = null;
-    	
-		String[] pathMembers = path.split(":");
-		for (int s = 0; s < pathMembers.length; s++) {
-			File tempFile = new File(pathMembers[s] + "/" + cmd);
+    private String getCmdFromPath(String cmd) throws IllegalStateException {
+        
+        String foundCmd = null;
+        
+        String[] pathMembers = pathEnv.split(File.pathSeparator);
+        for (int s = 0; s < pathMembers.length; s++) {
+            File tempFile = new File(pathMembers[s] + File.separator + cmd);
 
-			if (tempFile.exists()) {
-				foundCmd = tempFile.getPath();
-				break;
-			}
-		}
-		
-		return foundCmd;
+            if (tempFile.exists()) {
+                foundCmd = tempFile.getPath();
+                break;
+            }
+        }
+        
+        if (foundCmd == null) {
+            throw new IllegalStateException("Couldn't find command: " + cmd + " on PATH env var");
+        }
+        
+        return foundCmd;
     }
 
     /**

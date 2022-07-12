@@ -168,6 +168,7 @@ public class LibertyPluginSWTBotMavenTest {
      * Tests the start menu action on a dashboard listed application.
      */
     @Test
+    
     public void testStartWithWrapper() {
         
         // Start dev mode.
@@ -190,52 +191,41 @@ public class LibertyPluginSWTBotMavenTest {
     }
     
     @Test
-    public void testMavenImportProjIsMaven() throws IOException, InterruptedException {
+    public void UTImportProjIsMaven() throws IOException, InterruptedException {
 
-    	DevModeOperations devMode = new DevModeOperations();
-    	IWorkspace workspace = ResourcesPlugin.getWorkspace();
+        DevModeOperations devMode = new DevModeOperations();
+        IWorkspace workspace = ResourcesPlugin.getWorkspace();
         IWorkspaceRoot root = workspace.getRoot();
         String projectName = MVN_APP_NAME;
         IProject proj = root.getProject(projectName);
         Assertions.assertTrue(Project.isMaven(proj));
         
-        //String projPath = proj.getFullPath().toOSString();
         String projPath = proj.getLocation().toOSString();
-        String systemPath = System.getenv("PATH");
-    	String localMvnCmd = null;
-    	
-		String[] pathMembers = systemPath.split(File.pathSeparator);
-		if (devMode.isWindows()) {
-			localMvnCmd = "mvn.cmd";
-		}
-		else {
-			for (int s = 0; s < pathMembers.length; s++) {
-				File tempFile = new File(pathMembers[s] + "/mvn");
+        
+        String localMvnCmd = isWindows() ? "mvn.cmd" : "mvn";
+        String opaqueMvnCmd = devMode.getMavenCommand(projPath, "io.openliberty.tools:liberty-maven-plugin:dev -f " + projPath);
+        Assertions.assertTrue(opaqueMvnCmd.contains(localMvnCmd + " io.openliberty.tools:liberty-maven-plugin:dev"));
+        
+    }
+    
 
-				if (tempFile.exists()) {
-					localMvnCmd = tempFile.getPath();
-					break;
-				}
-			}
-		}
-        String opaqueMvnCmd = devMode.getMavenCommand(projPath, "io.openliberty.tools:liberty-maven-plugin:dev -f " + projPath, systemPath);
-        Assertions.assertTrue(opaqueMvnCmd.contains(localMvnCmd));
+    private boolean isWindows() {
+        return System.getProperty("os.name").contains("Windows");
     }
     
     @Test
-    public void testMavenImportProjIsMavenWrapper() throws IOException, InterruptedException {
+    public void UTImportProjIsMavenWrapper() throws IOException, InterruptedException {
 
-    	DevModeOperations devMode = new DevModeOperations();
-    	IWorkspace workspace = ResourcesPlugin.getWorkspace();
+        DevModeOperations devMode = new DevModeOperations();
+        IWorkspace workspace = ResourcesPlugin.getWorkspace();
         IWorkspaceRoot root = workspace.getRoot();
         String projectName = MVN_WRAPPER_APP_NAME;
         IProject proj = root.getProject(projectName);
         Assertions.assertTrue(Project.isMaven(proj));
         
         String projPath = proj.getLocation().toOSString();
-        String systemPath = System.getenv("PATH");
         
-        String opaqueMvnwCmd = devMode.getMavenCommand(projPath, "io.openliberty.tools:liberty-maven-plugin:dev -f " + projPath, systemPath);
+        String opaqueMvnwCmd = devMode.getMavenCommand(projPath, "io.openliberty.tools:liberty-maven-plugin:dev -f " + projPath);
         Assertions.assertTrue(opaqueMvnwCmd.contains("mvnw"));
     }
 
