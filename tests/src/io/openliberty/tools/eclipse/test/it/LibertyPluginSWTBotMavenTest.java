@@ -204,8 +204,7 @@ public class LibertyPluginSWTBotMavenTest {
         
         String localMvnCmd = isWindows() ? "mvn.cmd" : "mvn";
         String opaqueMvnCmd = devMode.getMavenCommand(projPath, "io.openliberty.tools:liberty-maven-plugin:dev -f " + projPath);
-        Assertions.assertTrue(opaqueMvnCmd.contains(localMvnCmd + " io.openliberty.tools:liberty-maven-plugin:dev"));
-        
+        Assertions.assertTrue(opaqueMvnCmd.contains(localMvnCmd + " io.openliberty.tools:liberty-maven-plugin:dev"), "Expected cmd to contain 'mvn io.openliberty.tools...' but cmd = " + opaqueMvnCmd);       
     }
     
 
@@ -226,7 +225,7 @@ public class LibertyPluginSWTBotMavenTest {
         String projPath = proj.getLocation().toOSString();
         
         String opaqueMvnwCmd = devMode.getMavenCommand(projPath, "io.openliberty.tools:liberty-maven-plugin:dev -f " + projPath);
-        Assertions.assertTrue(opaqueMvnwCmd.contains("mvnw"));
+        Assertions.assertTrue(opaqueMvnwCmd.contains("mvnw"), "Expected cmd to contain 'mvnw' but cmd = " + opaqueMvnwCmd );
     }
 
     /**
