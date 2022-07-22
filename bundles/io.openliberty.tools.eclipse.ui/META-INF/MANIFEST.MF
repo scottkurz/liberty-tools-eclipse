@@ -7,7 +7,8 @@ Bundle-Version: 0.1.0
 Bundle-Activator: io.openliberty.tools.eclipse.LibertyDevPlugin
 Export-Package: io.openliberty.tools.eclipse,
  io.openliberty.tools.eclipse.ui
-Require-Bundle: org.eclipse.ui
+Require-Bundle: org.eclipse.ui,
+ json
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Automatic-Module-Name: io.openliberty.tools.eclipse.ui
 Bundle-ActivationPolicy: lazy
