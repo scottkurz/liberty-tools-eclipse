@@ -507,7 +507,7 @@ public class DebugModeHandler {
         }
 
         throw new Exception("Unable to automatically attach the debugger to JVM on host: " + host + " and port: " + port
-                + ". Be sure that the server started. If the server started, but it took longer to start than the allocated auto connection time, manual action is required.");
+                + ". If the debug connection timed out but the server did start successfully, you can still manually create a Remote Java Application debug configuration with the mentioned port and attach to the server.");
     }
 
     private class DataHolder {
