@@ -89,17 +89,44 @@ public class DebugModeHandler {
     }
 
     /**
-     * Returns the input configuration parameters with the debug port argument appended.
+     * Returns the input configuration parameters with the debug port argument appended, if necessary
      * 
      * @param project The project associated with this call.
-     * @param debugPort The debug port to add to the parameter.
      * @param configParms The input parms from the Run configuration's dialog.
      * 
-     * @return The input configuration parameters with the debug port argument appended.
+     * @return Object encapsulating debug port plus start parameters updated (if necessary) with the debug port argument appended.
      * 
      * @throws Exception
      */
-    public String addDebugDataToStartParms(Project project, String debugPort, String configParms) throws Exception {
+    public DebugData updateDebugParams(Project project, String userParms) throws Exception {
+
+        if (Trace.isEnabled()) {
+            Trace.getTracer().traceEntry(Trace.TRACE_UI, new Object[] { project.getName(), userParms });
+        }
+
+        DebugData retVal = new DebugData();
+        retVal.startParms = userParms;
+
+        // 1. Try to find port in custom parms
+        retVal.debugPort = findDebugPortInParms(project, userParms);
+
+        // 2. If not found, get a random port and update parms
+        if (retVal.debugPort == null) {
+            try (ServerSocket socket = new ServerSocket(0)) {
+                int randomPort = socket.getLocalPort();
+                retVal.debugPort = String.valueOf(randomPort);
+                retVal.startParms = addDebugDataToStartParms(project, retVal.debugPort, userParms);
+            }
+        }
+
+        if (Trace.isEnabled()) {
+            Trace.getTracer().traceExit(Trace.TRACE_UI, retVal);
+        }
+
+        return retVal;
+    }
+
+    private String addDebugDataToStartParms(Project project, String debugPort, String configParms) throws Exception {
         String startParms = configParms;
         String addendum = null;
 
@@ -125,17 +152,16 @@ public class DebugModeHandler {
     }
 
     /**
-     * Determines and returns the debug port to be used.
+     * Find debug port within parms
      * 
      * @param project The project
      * @param inputParms
      * 
-     * @return The debug port to be used.
+     * @return The debug port in parms, or 'null', if not found
      */
-    public String calculateDebugPort(Project project, String inputParms) throws Exception {
+    public String findDebugPortInParms(Project project, String inputParms) throws Exception {
         String debugPort = null;
 
-        // 1. Check if the debugPort was specified as part of start parameters. If so, use that port first.
         String searchKey = null;
 
         BuildType buildType = project.getBuildType();
@@ -159,14 +185,6 @@ public class DebugModeHandler {
             }
         }
 
-        // 2. Get a random port.
-        if (debugPort == null) {
-            try (ServerSocket socket = new ServerSocket(0)) {
-                int randomPort = socket.getLocalPort();
-                debugPort = String.valueOf(randomPort);
-            }
-        }
-
         return debugPort;
 
     }
@@ -183,7 +201,7 @@ public class DebugModeHandler {
         String projectName = project.getIProject().getName();
 
         // Find if the project specifies a WLP_DEBUG_ADDRESS entry in the server.env (src/main/liberty/config).
-        // If it is specified, the port value under that variable needs to be ignored. 
+        // If it is specified, the port value under that variable needs to be ignored.
         // This is a safe place to do this because dev mode has not been started yet.
         String port = null;
         try {
@@ -513,4 +531,18 @@ public class DebugModeHandler {
     private class DataHolder {
         boolean closed;
     }
+
+    /**
+     * Encapsulates debug info
+     */
+    public class DebugData {
+        public String debugPort;
+        public String startParms;
+
+        @Override
+        public String toString() {
+            return new StringBuilder("debugPort = ").append(debugPort).append(", startParms = ").append(startParms).toString();
+        }
+    }
+
 }

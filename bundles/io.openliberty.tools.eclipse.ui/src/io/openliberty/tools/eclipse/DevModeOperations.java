@@ -28,6 +28,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
+import io.openliberty.tools.eclipse.DebugModeHandler.DebugData;
 import io.openliberty.tools.eclipse.Project.BuildType;
 import io.openliberty.tools.eclipse.logging.Trace;
 import io.openliberty.tools.eclipse.ui.dashboard.DashboardView;
@@ -178,8 +179,9 @@ public class DevModeOperations {
             String startParms = null;
             String debugPort = null;
             if (ILaunchManager.DEBUG_MODE.equals(mode)) {
-                debugPort = debugModeHandler.calculateDebugPort(project, userParms);
-                startParms = debugModeHandler.addDebugDataToStartParms(project, debugPort, userParms);
+                DebugData debugData = debugModeHandler.updateDebugParams(project, userParms);
+                debugPort = debugData.debugPort;
+                startParms = debugData.startParms;
             } else {
                 startParms = userParms;
             }
@@ -289,8 +291,9 @@ public class DevModeOperations {
             String startParms = null;
             String debugPort = null;
             if (ILaunchManager.DEBUG_MODE.equals(mode)) {
-                debugPort = debugModeHandler.calculateDebugPort(project, userParms);
-                startParms = debugModeHandler.addDebugDataToStartParms(project, debugPort, userParms);
+                DebugData debugData = debugModeHandler.updateDebugParams(project, userParms);
+                debugPort = debugData.debugPort;
+                startParms = debugData.startParms;
             } else {
                 startParms = userParms;
             }
@@ -898,4 +901,5 @@ public class DevModeOperations {
             dashboardView.refreshDashboardView(projectModel, reportError);
         }
     }
+
 }
