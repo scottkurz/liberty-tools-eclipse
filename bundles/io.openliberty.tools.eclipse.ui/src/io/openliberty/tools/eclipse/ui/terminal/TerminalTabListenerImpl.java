@@ -14,6 +14,7 @@ package io.openliberty.tools.eclipse.ui.terminal;
 
 import org.eclipse.tm.terminal.view.core.interfaces.ITerminalTabListener;
 
+import io.openliberty.tools.eclipse.Project;
 import io.openliberty.tools.eclipse.logging.Trace;
 
 /**
@@ -22,17 +23,17 @@ import io.openliberty.tools.eclipse.logging.Trace;
 public class TerminalTabListenerImpl implements ITerminalTabListener {
 
     /**
-     * The name of the project being processed.
+     * The project being processed.
      */
-    String projectName;
+    Project project;
 
     /**
      * Constructor.
      *
      * @param projectName The name of the project to be associated with this listener.
      */
-    public TerminalTabListenerImpl(String projectName) {
-        this.projectName = projectName;
+    public TerminalTabListenerImpl(Project project) {
+        this.project = project;
     }
 
     /**
@@ -40,6 +41,8 @@ public class TerminalTabListenerImpl implements ITerminalTabListener {
      */
     @Override
     public void terminalTabDisposed(Object source, Object data) {
+        String projectName = project.getName();
+
         // Perform cleanup if the project name associated with the disposed tab matches the project name associated with this
         // listener. Note that, input "data" is the custom data (ITerminalsConnectorConstants.PROP_DATA = project name) provided
         // for opening the console. This is a bit more reliable and easier to use than using the "source" input (CTabItem) on
@@ -51,7 +54,7 @@ public class TerminalTabListenerImpl implements ITerminalTabListener {
                     Trace.getTracer().trace(Trace.TRACE_UI, "The terminal associated with project " + projectName
                             + " was closed. Processing cleanup. Listener: " + this + ". Source: " + source + ". Data: " + data);
                 }
-                ProjectTabController.getInstance().cleanupDisposedTerminal(projectName);
+                ProjectTabController.getInstance().cleanupDisposedTerminal(project);
             }
         }
     }

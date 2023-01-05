@@ -13,7 +13,6 @@
 package io.openliberty.tools.eclipse.ui.terminal;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -55,6 +54,8 @@ public class ProjectTab {
     /** The name of the application project associated with this terminal. */
     private String projectName;
 
+    private Project project;
+
     /**
      * Terminal connector instance set by the LocalDevModeLauncherDelegate when the connector is created during initial connection.
      */
@@ -74,12 +75,12 @@ public class ProjectTab {
 
     /** Tab image */
     private Image libertyImage;
-    
+
     /**
      * PID of running server
      */
     private String serverPid;
-    
+
     /**
      * Current time just before command start
      */
@@ -96,12 +97,13 @@ public class ProjectTab {
     /**
      * Constructor.
      *
-     * @param projectName The application project name.
+     * @param project The application project name.
      */
-    public ProjectTab(String projectName) {
-        this.projectName = projectName;
+    public ProjectTab(Project project) {
+        this.project = project;
+        this.projectName = project.getName();
         this.terminalService = TerminalServiceFactory.getService();
-        this.tabListener = new TerminalTabListenerImpl(projectName);
+        this.tabListener = new TerminalTabListenerImpl(project);
         this.libertyImage = Utils.getImage(PlatformUI.getWorkbench().getDisplay(), DashboardView.LIBERTY_LOGO_PATH);
         this.serverPid = null;
 
@@ -134,7 +136,7 @@ public class ProjectTab {
      * @param envs The list of environment properties to be set on the terminal.
      */
     public void runCommand(Project project, String command, List<String> envs) {
-    	String projectPath = project.getPath();
+        String projectPath = project.getPath();
         if (Trace.isEnabled()) {
             Trace.getTracer().traceEntry(Trace.TRACE_UI, new Object[] { projectPath, command, envs });
         }
@@ -162,86 +164,87 @@ public class ProjectTab {
 
         // Get the current time before running the command
         this.preStartTime = FileTime.fromMillis(System.currentTimeMillis());
-        
+
         terminalService.openConsole(getProperties(projectPath, envs, command), done);
-        
+
         // Read and save pid for Liberty server process
-        serverPid = getPidOfRunningServer(project);
+        // serverPid = getPidOfRunningServer(project);
 
         if (Trace.isEnabled()) {
             Trace.getTracer().traceExit(Trace.TRACE_UI);
         }
     }
-    
+
     /**
-     * 
-     * Read the pid of the running server from the messages.log file. 
+     * Read the pid of the running server from the messages.log file.
      * 
      * @param project
+     * 
      * @return
      */
     private String getPidOfRunningServer(Project project) {
-    	try {
-        	// If this is the first start for this server, the messages.log file may
-    		// not be created yet. Loop for 30 seconds until the file is found.
-        	int timeout = 0;
-        	Path pathToMessagesLog = getMessagesLogPath(project);
-        	while (pathToMessagesLog == null && timeout < 30) {
-        		Thread.sleep(1000);
-        		timeout++;
-        		
-        		pathToMessagesLog = getMessagesLogPath(project);
-        	}
-        	if (pathToMessagesLog != null) {
-        		// At this point, we found the messages.log file, but this could be from a previous server start. 
-        		// Loop until the creation time of messages.log is after the start time of the issued command.
-        		timeout = 0;
-        		boolean messagesLogIsCurrent = false;
-        		while (!messagesLogIsCurrent && timeout < 30) {
-        			Thread.sleep(1000);
-        			timeout++;
-        			
-        			FileTime createTime = Files.readAttributes(pathToMessagesLog, BasicFileAttributes.class).creationTime();
-        			
-        			messagesLogIsCurrent = createTime.compareTo(preStartTime) > 0;
-        		}
-        		
-        		if (messagesLogIsCurrent) {
-        		
-	        		if (Trace.isEnabled()) {
-			            Trace.getTracer().traceEntry(Trace.TRACE_UI, "Reading pid from " + pathToMessagesLog.toString());
-			        }
-	                
-					for(String line : Files.readAllLines(pathToMessagesLog)) {
-						if (line.contains("process =")) {
-							String pid = line.split("=")[1].trim().replaceAll("\\D.*", "");;
-							if (Trace.isEnabled()) {
-					            Trace.getTracer().traceEntry(Trace.TRACE_UI, "Saving pid for server: " + pid);
-					        }
-							return pid;
-						}
-					}
-					
-        		} else {
-        			if (Trace.isEnabled()) {
-    		            Trace.getTracer().traceEntry(Trace.TRACE_UI, "Current messages.log could not be found.");
-    		        }
-        		}
-        	} else {
-        		if (Trace.isEnabled()) {
-		            Trace.getTracer().traceEntry(Trace.TRACE_UI, "Timedout waiting for messages.log to be available.");
-		        }
-        	}
-			
-		} catch (Exception e) {
-			if (Trace.isEnabled()) {
-	            Trace.getTracer().traceEntry(Trace.TRACE_UI, "Exception while reading messages.log: " + e.getMessage());
-	        }
-		}
-    	
-    	return null;
+        try {
+            // If this is the first start for this server, the messages.log file may
+            // not be created yet. Loop for 30 seconds until the file is found.
+            int timeout = 0;
+            Path pathToMessagesLog = getMessagesLogPath(project);
+            while (pathToMessagesLog == null && timeout < 30) {
+                Thread.sleep(1000);
+                timeout++;
+
+                pathToMessagesLog = getMessagesLogPath(project);
+            }
+            if (pathToMessagesLog != null) {
+                // At this point, we found the messages.log file, but this could be from a previous server start.
+                // Loop until the creation time of messages.log is after the start time of the issued command.
+                timeout = 0;
+                boolean messagesLogIsCurrent = false;
+                while (!messagesLogIsCurrent && timeout < 30) {
+                    Thread.sleep(1000);
+                    timeout++;
+
+                    FileTime createTime = Files.readAttributes(pathToMessagesLog, BasicFileAttributes.class).creationTime();
+
+                    messagesLogIsCurrent = createTime.compareTo(preStartTime) > 0;
+                }
+
+                if (messagesLogIsCurrent) {
+
+                    if (Trace.isEnabled()) {
+                        Trace.getTracer().traceEntry(Trace.TRACE_UI, "Reading pid from " + pathToMessagesLog.toString());
+                    }
+
+                    for (String line : Files.readAllLines(pathToMessagesLog)) {
+                        if (line.contains("process =")) {
+                            String pid = line.split("=")[1].trim().replaceAll("\\D.*", "");
+                            ;
+                            if (Trace.isEnabled()) {
+                                Trace.getTracer().traceEntry(Trace.TRACE_UI, "Saving pid for server: " + pid);
+                            }
+                            return pid;
+                        }
+                    }
+
+                } else {
+                    if (Trace.isEnabled()) {
+                        Trace.getTracer().traceEntry(Trace.TRACE_UI, "Current messages.log could not be found.");
+                    }
+                }
+            } else {
+                if (Trace.isEnabled()) {
+                    Trace.getTracer().traceEntry(Trace.TRACE_UI, "Timedout waiting for messages.log to be available.");
+                }
+            }
+
+        } catch (Exception e) {
+            if (Trace.isEnabled()) {
+                Trace.getTracer().traceEntry(Trace.TRACE_UI, "Exception while reading messages.log: " + e.getMessage());
+            }
+        }
+
+        return null;
     }
-    
+
     /**
      * Returns the path of the server's messages.log file after Liberty server deployment.
      * 
@@ -459,12 +462,12 @@ public class ProjectTab {
             libertyImage.dispose();
         }
     }
-    
+
     /**
      * Return the pid of the running server
      */
     public String getServerPid() {
-    	return this.serverPid;
+        return this.serverPid;
     }
 
     /**

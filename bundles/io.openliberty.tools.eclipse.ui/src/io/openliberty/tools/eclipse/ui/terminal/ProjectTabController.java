@@ -33,10 +33,10 @@ import io.openliberty.tools.eclipse.ui.terminal.ProjectTab.State;
  * Manages a set of terminal view project tab instances.
  */
 public class ProjectTabController {
-	
-	private static final int POLL_DELAY_SECS = 10;
-	
-	private static final boolean isWindows = System.getProperty("os.name").toLowerCase().indexOf("win") >= 0;
+
+    private static final int POLL_DELAY_SECS = 10;
+
+    private static final boolean isWindows = System.getProperty("os.name").toLowerCase().indexOf("win") >= 0;
 
     /** Terminal view ID. */
     public static final String TERMINAL_VIEW_ID = "org.eclipse.tm.terminal.view.ui.TerminalsView";
@@ -82,8 +82,8 @@ public class ProjectTabController {
      * @param envs The environment properties to be set on the terminal.
      */
     public void runOnTerminal(Project project, String command, List<String> envs) {
-    	String projectName = project.getName();
-        ProjectTab projectTab = new ProjectTab(projectName);
+        String projectName = project.getName();
+        ProjectTab projectTab = new ProjectTab(project);
         projectTabMap.put(projectName, projectTab);
         projectTab.runCommand(project, command, envs);
     }
@@ -232,43 +232,37 @@ public class ProjectTabController {
 
         return false;
     }
-    
+
     /**
-     * Cleaup a disposed terminal by first stopping any running process
+     * Cleanup a disposed terminal by first stopping any running process
      *
-     * @param projectName The application project name.
+     * @param project The application project name.
      */
-    public void cleanupDisposedTerminal(String projectName) {
+    public void cleanupDisposedTerminal(Project project) {
         // Try to kill the running server
-    	ProjectTab projectTab = projectTabMap.get(projectName);
+        ProjectTab projectTab = projectTabMap.get(project.getName());
         if (projectTab != null) {
-        	String pid = projectTab.getServerPid();
-        	if (pid != null) {
-	        	if (Trace.isEnabled()) {
-	                Trace.getTracer().traceEntry(Trace.TRACE_UI, new Object[] { projectName, pid });
-	            }
-		    	String command;
-				if (isWindows) {
-					command = "cmd /c \"tasklist /FI \"PID eq " + pid + "\" | findstr " + pid + "\"";
-				} else {
-					command = "kill -0 " + pid;
-				}
-		        try {
-		        	if (Trace.isEnabled()) {
-			            Trace.getTracer().traceEntry(Trace.TRACE_UI, "Killing server process with pid " + pid);
-			        }
-		        	runBackgroundCommand(command);
-		        } catch (Exception e) {
-		        	if (Trace.isEnabled()) {
-			            Trace.getTracer().traceEntry(Trace.TRACE_UI, "Failed to kill server process. Exception: " + e.getMessage());
-			        }
-		        }
-        	}
+
+            String command = "";
+            String serverCmdPath = project.getPath() + "/target/liberty/wlp/bin/server.bat";
+
+            if (isWindows) {
+                command = "cmd /c \"" + serverCmdPath + " stop\"";
+            }
+            try {
+                if (Trace.isEnabled()) {
+                    Trace.getTracer().traceEntry(Trace.TRACE_UI, "Stopping server process");
+                }
+                runBackgroundCommand(command);
+            } catch (Exception e) {
+                if (Trace.isEnabled()) {
+                    Trace.getTracer().traceEntry(Trace.TRACE_UI, "Failed to kill server process. Exception: " + e.getMessage());
+                }
+            }
         }
-    	
-    	cleanupTerminal(projectName);
+
+        cleanupTerminal(project.getName());
     }
-    	
 
     /**
      * Cleans up the objects associated with the terminal object represented by the input project name.
@@ -310,22 +304,22 @@ public class ProjectTabController {
                     + ". projectTerminalListenerMapSize: " + projectTerminalListenerMap.size());
         }
     }
-    
+
     private void runBackgroundCommand(String command) {
-    	Process process = null;
-		boolean finished = false;
-		try {
-			process = Runtime.getRuntime().exec(command);
-			finished = process.waitFor(POLL_DELAY_SECS, TimeUnit.SECONDS);
-		} catch (IOException | InterruptedException e) {
-			if (Trace.isEnabled()) {
-	            Trace.getTracer().traceEntry(Trace.TRACE_UI, "Failed to stop server process: " + e.getMessage());
-			}
-		} finally {
-			if (process != null && !finished) {
-				process.destroyForcibly();
-			}
-		}
+        Process process = null;
+        boolean finished = false;
+        try {
+            process = Runtime.getRuntime().exec(command);
+            finished = process.waitFor(POLL_DELAY_SECS, TimeUnit.SECONDS);
+        } catch (IOException | InterruptedException e) {
+            if (Trace.isEnabled()) {
+                Trace.getTracer().traceEntry(Trace.TRACE_UI, "Failed to stop server process: " + e.getMessage());
+            }
+        } finally {
+            if (process != null && !finished) {
+                process.destroyForcibly();
+            }
+        }
     }
 
     /**
