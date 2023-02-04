@@ -286,3 +286,20 @@ Liberty Tools editing assistance provides code completion, diagnostics, and quic
 ![Jakarta EE quick-dix](images/jakarta-ee-ls-quick-fix.png)
 
 Jakarta EE API configuration assistance is offered through Eclipse LSP4Jakarta, the Language Server for Jakarta EE. For more information, see the [project documentation in GitHub](https://github.com/eclipse/lsp4jakarta#eclipse-lsp4jakarta).
+
+## Importing Gradle projects
+
+The Gradle Eclipse plugins (the Buildship components) run a simple Gradle build upon import (upon **Import -> Gradle -> Existing Gradle Project**) to query project information.
+
+The Gradle-related preferences in your Eclipse workspace need to be configured such that this build can complete successfully, or else the Liberty Tools function may not work correctly.
+
+E.g. one problem in particular can arise if your project uses a Gradle wrapper at a Gradle version less than v7.3 (and thus NOT supporting Java 17 per [matrix](https://docs.gradle.org/current/userguide/compatibility.html)), while using the Java 17+ workspace JRE required for running Liberty Tools.
+
+One approach for resolving this incompatibility is to configure the preference at:
+**Preferences -> Gradle -> Java home** to refer to a Java installation compatible with the level of Gradle in your gradlew wrapper.
+
+
+## Maven multi-module projects
+
+
+
