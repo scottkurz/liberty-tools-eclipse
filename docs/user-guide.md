@@ -256,6 +256,9 @@ server.xml             | bootstrap.properties
 
 Liberty configuration assistance is offered through the Liberty Config Language Server. For more information, see the [project documentation in GitHub](https://github.com/OpenLiberty/liberty-language-server#liberty-config-language-server).
 
+
+
+
 ## Developing with MicroProfile
 
 Liberty Tools editing assistance provides hover-over, code completion, and diagnostics in configuration and application files for MicroProfile APIs.
@@ -286,3 +289,31 @@ Liberty Tools editing assistance provides code completion, diagnostics, and quic
 ![Jakarta EE quick-dix](images/jakarta-ee-ls-quick-fix.png)
 
 Jakarta EE API configuration assistance is offered through Eclipse LSP4Jakarta, the Language Server for Jakarta EE. For more information, see the [project documentation in GitHub](https://github.com/eclipse/lsp4jakarta#eclipse-lsp4jakarta).
+
+
+## Avoid Trouble
+
+#### Problems configuring a Liberty server
+
+#### server.xml configuration elements not present as text completion options
+
+The set of configuration elements available for assistance, via text completion, hover, etc., is populated from an XSD file.  For a project which already has a Liberty install associated with it (e.g. if dev mode has already run), this XSD file is generated based upon the *currently installed features* for this particular Liberty installation.   For a project without a Liberty install (e.g. newly-cloned from source), there is a "complete" XSD with all possible configuration elements.
+
+Because of this it is possible that, for a single server.xml, assistance for a given configuration element may be available when this is project is used with one Liberty install and not with another.   It is also possible that assistance is available before a Liberty install is performed but not after.
+
+The benefits of this approach are that you will avoid adding configuration elements that are not used at runtime, because the associated features to make use of them have not been installed.
+
+Some recommendations for working with this aspect of the tooling:
+
+* Use of the latest Maven/Gradle plugins mentioned in the [Application requirements](#application-requirements) section is recommended to improve the lifecycle of the generation and refresh of this XSD file.
+* After adding new features to `server.xml` in the IDE, the file must be saved in order to trigger an install of the new feature(s), and then a regeneration of the associated XSD file.
+
+#### server.xml, server.env, bootstrap.properties not recognized at non-default paths
+
+Though the Liberty Maven/Gradle plugins have configuration for non-default config file locations, (e.g. the Liberty Maven/Gradle plugins `serverXmlFile` parameter), Liberty Tools currently assumes use of the default paths of:
+
+* src/main/liberty/config/server.xml
+* src/main/liberty/config/server.env
+* src/main/liberty/config/bootstrap.properties
+
+(although there is some additional support for using **configDropins** locations).  
