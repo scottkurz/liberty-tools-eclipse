@@ -293,7 +293,7 @@ Jakarta EE API configuration assistance is offered through Eclipse LSP4Jakarta, 
 
 ## Avoid Trouble
 
-#### Problems configuring a Liberty server
+### Problems configuring a Liberty server
 
 #### server.xml configuration elements not present as text completion options
 
@@ -317,3 +317,7 @@ Though the Liberty Maven/Gradle plugins have configuration for non-default confi
 * src/main/liberty/config/bootstrap.properties
 
 (although there is some additional support for using **configDropins** locations).  
+
+### Jakarta and/or MicroProfile code assistance is not working for a particular project
+
+
