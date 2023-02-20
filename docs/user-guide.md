@@ -320,4 +320,7 @@ Though the Liberty Maven/Gradle plugins have configuration for non-default confi
 
 ### Jakarta and/or MicroProfile code assistance is not working for a particular project
 
+In general the code assistance function provided by the respective language servers is activated via the presence of a particular API class on the application build "classpath".  
+
+Note that for Maven and Gradle projects, a change to build configuration in pom.xml or build.gradle may need to be followed by a **Maven->Update Project** (Alt+F5 on Windows) or a **Gradle -> Refresh Gradle Project** in order to refresh the Eclipse Java builder's view of the project classpath.
 
