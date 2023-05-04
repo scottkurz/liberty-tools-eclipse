@@ -26,10 +26,9 @@ pipeline {
             steps {
                 dir('liberty-tools-eclipse') {
                     // Clone git repo
-                    git branch: 'widget_finder',
-                       credentialsId: 'wasdev.github.ibm.ssh.key',
-                       // url: 'https://github.ibm.com/skurz/lte-mwf-test'
-                       url: 'git@github.ibm.com:skurz/lte-mwf-test.git'
+                    git branch: 'magic-widget-finder-rework',
+                       credentialsId: 'wasdev.github.ssh.key',
+                       url: 'git@github.com:scottkurz/liberty-tools-eclipse.git'
                 }
             }
         }
