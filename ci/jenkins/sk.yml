@@ -26,7 +26,7 @@ pipeline {
             steps {
                 dir('liberty-tools-eclipse') {
                     // Clone git repo
-                    git branch: 'magic-widget-finder-rework',
+                    git branch: 'magic-widget-finder-rework-j',
                        credentialsId: 'wasdev.github.ssh.key',
                        url: 'git@github.com:scottkurz/liberty-tools-eclipse.git'
                 }
