@@ -874,6 +874,14 @@ public class DevModeOperations {
 
                         if (!completed) {
                             setProperty(STOP_JOB_COMPLETION_TIMEOUT, Boolean.TRUE);
+                                BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                                StringBuilder builder = new StringBuilder();
+                                String line = null;
+                                while ((line = reader.readLine()) != null) {
+                                    builder.append(line);
+                                    builder.append(System.getProperty("line.separator"));
+                                }
+                                setProperty(STOP_JOB_COMPLETION_OUTPUT, builder.toString());
                         } else {
                             setProperty(STOP_JOB_COMPLETION_EXIT_CODE, p.exitValue());
                             if (p.exitValue() != 0) {
@@ -909,6 +917,10 @@ public class DevModeOperations {
                      */
                     Object timeoutOnCompletion = event.getJob().getProperty(STOP_JOB_COMPLETION_TIMEOUT);
                     if (Boolean.TRUE.equals(timeoutOnCompletion)) {
+
+                        String outputTxt = (String) event.getJob().getProperty(STOP_JOB_COMPLETION_OUTPUT);
+                        Logger.logError("stop command timed out, process output: " + outputTxt);
+
                         // Need to do this on main thread since it's displayed to the user.
                         Display.getDefault().syncExec(new Runnable() {
                             @Override
