@@ -1852,7 +1852,7 @@ public class MagicWidgetFinder {
                 }
                 
 
-                if (objPoll.depth > 30) {
+                if (objPoll.depth > 300) {
                     continue;
                 }
 
