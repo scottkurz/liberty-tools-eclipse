@@ -963,15 +963,21 @@ public class MagicWidgetFinder {
 
                 @Override
                 public void run() {
-
+                    
                     Shell shellConstraint = null;
                     if (neighbour instanceof Control) {
                         shellConstraint = ((Control) neighbour).getShell();
                     }
 
                     try {
+                    System.out.println("[" + utilgetRuntimePos() + "] SKSK - Before visitQueue, trying to find name = " + name 
+                            + ", from neighbor = " + neighbour + ", with shellConstraint = " + shellConstraint );
+
                         long startTimeInNanos = System.nanoTime();
                         Magic.visitQueue(neighbour, name, parent, shellConstraint, matches, new HashMap<Object, Boolean>(), options);
+
+                    System.out.println("[" + utilgetRuntimePos() + "] SKSK - After visitQueue, trying to find name = " + name 
+                            + ", from neighbor = " + neighbour + ", with shellConstraint = " + shellConstraint );
 
                         logOut("* Magic.visitQueue time: [" + name + "]: "
                                 + ((double) TimeUnit.MILLISECONDS.convert(System.nanoTime() - startTimeInNanos, TimeUnit.NANOSECONDS))
@@ -1211,6 +1217,8 @@ public class MagicWidgetFinder {
 
         private boolean logOut = true; // whether to log non-errors
 
+        private boolean extraLogging = false;
+        
         private static final Option DEFAULT = (new Builder()).setDelayAfterActionInMsecs(500).setRetryAttempts(5)
                 .setUnrestrictedSearch(false).setMatcher(null).setUseContains(false).setWidgetClass(null).setThrowExceptionOnNotFound(true)
                 .build();
@@ -1348,6 +1356,11 @@ public class MagicWidgetFinder {
 
             public Builder setLogOut(boolean b) {
                 inner.logOut = b;
+                return this;
+            }
+            
+            public Builder setExtraLogging(boolean b) {
+                inner.extraLogging = b;
                 return this;
             }
 
@@ -1812,6 +1825,11 @@ public class MagicWidgetFinder {
 
         }
 
+        private static String trunc(Object obj) {
+            String str = obj.toString();
+            return str.length() > 100 ? str.substring(0,100) : str;           
+        }
+        
         public static void visitQueue(final Object initialObject, String matchingText, final Node parent, final Shell shellConstraint,
                 List<Node> matches, final HashMap<Object, Boolean> allSeen, final Option options)
                 throws IllegalArgumentException, IllegalAccessException {
@@ -1828,6 +1846,11 @@ public class MagicWidgetFinder {
                 final QueueObj objPoll = queue.poll();
 
                 Object obj = objPoll.obj;
+
+                if (options.extraLogging) {
+                    System.out.println("[" + utilgetRuntimePos() + "] SKSK - In visitQueue, next queue item = " + trunc(obj));
+                }
+                
 
                 if (objPoll.depth > 30) {
                     continue;
@@ -1861,7 +1884,9 @@ public class MagicWidgetFinder {
                 }
 
                 if (matchingText != null && matches != null && utilIsNodeAMatch(thisNode, matchingText, matches, options)) {
-
+                    if (options.extraLogging) {
+                    System.out.println("[" + utilgetRuntimePos() + "] SKSK - In visitQueue, utilIsNodeAMatch is true");
+                    }
                     boolean isMatch = true;
 
                     if (isMatch && options.getMatcher() != null) {
@@ -1882,7 +1907,13 @@ public class MagicWidgetFinder {
 
                     // We only keep searching if the user has told us too, otherwise we return now that we have found a result
                     if (isMatch && !options.isUnrestrictedSearch()) {
+                        if (options.extraLogging) {
+                        System.out.println("[" + utilgetRuntimePos() + "] SKSK - In visitQueue, WAS a match");
+                        }
                         break;
+                    }
+                    if (options.extraLogging) {
+                    System.out.println("[" + utilgetRuntimePos() + "] SKSK - In visitQueue, WAS NOT a match");
                     }
                 }
 
