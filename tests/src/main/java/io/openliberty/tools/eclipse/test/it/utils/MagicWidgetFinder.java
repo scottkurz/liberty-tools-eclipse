@@ -1852,7 +1852,8 @@ public class MagicWidgetFinder {
                 }
                 
 
-                if (objPoll.depth > 300) {
+                if (objPoll.depth > 30) {
+                    System.out.println("[" + utilgetRuntimePos() + "] SKSK - Continue because objPoll.depth = " + objPoll.depth);
                     continue;
                 }
 
