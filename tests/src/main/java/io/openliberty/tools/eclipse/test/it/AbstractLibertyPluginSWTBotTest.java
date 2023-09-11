@@ -156,10 +156,10 @@ public abstract class AbstractLibertyPluginSWTBotTest {
      * @throws CoreException
      */
     public static void importGradleApplications(ArrayList<File> projectsToInstall) {
-        Display.getDefault().syncExec(new Runnable() {
-
-            @Override
-            public void run() {
+//        Display.getDefault().syncExec(new Runnable() {
+//
+ //           @Override
+  //          public void run() {
                 try {
                     for (File projectFile : projectsToInstall) {
                         IPath projectLocation = org.eclipse.core.runtime.Path
@@ -172,9 +172,9 @@ public abstract class AbstractLibertyPluginSWTBotTest {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }
-
-        });
+   //         }
+//
+ //       });
     }
 
     /**
