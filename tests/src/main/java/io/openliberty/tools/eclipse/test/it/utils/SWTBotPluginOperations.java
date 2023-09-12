@@ -40,7 +40,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolItem;
-import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
@@ -532,7 +532,7 @@ public class SWTBotPluginOperations {
         go("Run", shell);
     }
 
-    private static Tree parentTreeStatic;
+    private static Composite parentComposite;
     
     public static void setCustomStartParmsFromShell(Shell shell, String runDebugConfigName, String customParms) {
     	
@@ -545,11 +545,11 @@ public class SWTBotPluginOperations {
 
             @Override
             public void run() {
-                parentTreeStatic = appConfigEntry.getParent();
+                parentComposite = appConfigEntry.getParent().getParent();
             }
         });
 
-        Object parmLabel = find("Start parameters:", parentTreeStatic, Option.factory().widgetClass(Label.class).setExtraLogging(true).build());
+        Object parmLabel = find("Start parameters:", parentComposite, Option.factory().widgetClass(Label.class).setExtraLogging(true).build());
 
         Control parmText = ControlFinder.findControlInRange(parmLabel, Text.class, Direction.EAST);
         set(parmText, customParms);
