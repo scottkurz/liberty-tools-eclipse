@@ -1852,8 +1852,7 @@ public class MagicWidgetFinder {
                 }
                 
 
-                if (objPoll.depth > 30) {
-                    System.out.println("[" + utilgetRuntimePos() + "] SKSK - Continue because objPoll.depth = " + objPoll.depth);
+                if (objPoll.depth > 300) {
                     continue;
                 }
 
@@ -2162,7 +2161,8 @@ public class MagicWidgetFinder {
 
             } else if (o instanceof Text) {
                 Text t = (Text) o;
-                info.setText(t.getText());
+                //info.setText(t.getText());
+                info.setText(t.getMessage());
                 info.setTooltipText(t.getToolTipText());
 
             } else if (o instanceof ToolItem) {
