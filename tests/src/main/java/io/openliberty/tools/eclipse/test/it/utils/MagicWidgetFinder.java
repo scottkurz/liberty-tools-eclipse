@@ -13,6 +13,8 @@
 package io.openliberty.tools.eclipse.test.it.utils;
 
 import java.io.IOException;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.lang.ref.Reference;
 import java.lang.reflect.Array;
@@ -989,24 +991,29 @@ public class MagicWidgetFinder {
                         e.printStackTrace();
                     }
 
-                    // if(name.equals("New")) {
-                    // try {
-                    // FileOutputStream fos = new FileOutputStream(new File("d:\\delme\\JGWTest.log"));
-                    // debugDumpNodes(parent, 0, fos);
-                    // fos.close();
-                    // } catch(Exception e) {
-                    // e.printStackTrace();
-                    // }
-                    // }
-
-                    // breadthFirstSearch(parent, name, matches, neighbour instanceof Control ? ((Control)neighbour).getShell() : null ,
-                    // options);
+                    if(name.equals("Example: -DhotTests=true")) {
+                     try {
+                     FileOutputStream fos = new FileOutputStream(new File("MWFout.log"));
+                     debugDumpNodes(parent, 0, fos);
+                     fos.close();
+                     } catch(Exception e) {
+                     e.printStackTrace();
+                     }
+                     }
 
                 }
             });
 
             if (matches.size() == 0) {
-                logErr("[find] * " + name + " not found.", options);
+                logErr("Dump to MWFout - [find] * " + name + " not found.", options);
+
+                    try {
+                      FileOutputStream fos = new FileOutputStream(new File("MWFerr.log"));
+                     debugDumpNodes(parent, 0, fos);
+                     fos.close();
+                     } catch(Exception e) {
+                      e.printStackTrace();
+                     }
 
                 try {
                     TimeUnit.SECONDS.sleep(2);

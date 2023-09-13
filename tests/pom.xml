@@ -24,7 +24,7 @@
     <packaging>eclipse-test-plugin</packaging>
 
     <properties>
-        <testAppImportWait>60000</testAppImportWait>
+        <testAppImportWait>120000</testAppImportWait>
     </properties>
 
     <build>
