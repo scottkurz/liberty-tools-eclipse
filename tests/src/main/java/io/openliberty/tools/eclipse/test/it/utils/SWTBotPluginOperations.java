@@ -551,6 +551,7 @@ public class SWTBotPluginOperations {
 
 //        Object parmLabel = find("Start parameters:", parentTreeStatic, Option.factory().widgetClass(Label.class).setExtraLogging(true).build());
 //        Control parmText = ControlFinder.findControlInRange(parmLabel, Text.class, Direction.EAST);
+new SWTWorkbenchBot().captureScreenshot("sksk-screenshot.png");
 
         Object parmText = find("Example: -DhotTests=true", parentTreeStatic, Option.factory().widgetClass(Text.class).setExtraLogging(true).build());
         set(parmText, customParms);

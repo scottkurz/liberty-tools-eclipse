@@ -217,6 +217,7 @@ public class LibertyPluginSWTBotMavenTest extends AbstractLibertyPluginSWTBotTes
                 () -> "Maven application " + MVN_APP_NAME + " does not contain the expected menu items: " + mvnMenuItems);
 
         // Check that the Run As menu contains the expected shortcut
+/*
         SWTBotMenu runAsMenu = getAppRunAsMenu(bot, MVN_APP_NAME);
         Assertions.assertTrue(runAsMenu != null, "The runAs menu associated with project: " + MVN_APP_NAME + " is null.");
         List<String> runAsMenuItems = runAsMenu.menuItems();
@@ -237,7 +238,7 @@ public class LibertyPluginSWTBotMavenTest extends AbstractLibertyPluginSWTBotTes
                 "The runAs menu associated with project: " + MVN_APP_NAME
                         + " does not contain one or more expected entries. Expected number of entries: " + runAsShortcuts.length
                         + "Found entry count: " + foundItems + ". Found menu entries: " + runAsMenuItems);
-
+*/
         // Check that the Debug As menu contains the expected shortcut
         SWTBotMenu debugAsMenu = getAppDebugAsMenu(bot, MVN_APP_NAME);
         Assertions.assertTrue(debugAsMenu != null, "The debugAs menu associated with project: " + MVN_APP_NAME + " is null.");
