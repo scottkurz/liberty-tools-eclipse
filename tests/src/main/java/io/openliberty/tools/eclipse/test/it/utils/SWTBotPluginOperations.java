@@ -536,7 +536,10 @@ public class SWTBotPluginOperations {
     	
         Object libertyConfigTree = getLibertyTreeItem(shell); 
 
-        Object appConfigEntry = find(runDebugConfigName, libertyConfigTree, Option.factory().useContains(true).widgetClass(TreeItem.class).build());
+        TreeItem appConfigEntry = (TreeItem)find(runDebugConfigName, libertyConfigTree, Option.factory().useContains(true).widgetClass(TreeItem.class).build());
+        System.out.println("SKSK: In setCustomStartParmsFromShell, found appConfigEntry = " + appConfigEntry);
+        System.out.println("SKSK: In setCustomStartParmsFromShell, found appConfigEntry = " + appConfigEntry.getText());
+        System.out.println("SKSK: In setCustomStartParmsFromShell, found appConfigEntry = " + appConfigEntry.getParent());
         go(appConfigEntry);
         Object parmLabel = find("Start parameters:", appConfigEntry, Option.factory().widgetClass(Label.class).build());
 
