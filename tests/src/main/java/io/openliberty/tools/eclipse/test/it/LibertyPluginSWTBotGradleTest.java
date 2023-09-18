@@ -44,7 +44,7 @@ import static io.openliberty.tools.eclipse.test.it.utils.SWTBotPluginOperations.
 import static io.openliberty.tools.eclipse.test.it.utils.SWTBotPluginOperations.setBuildCmdPathInPreferences;
 import static io.openliberty.tools.eclipse.test.it.utils.SWTBotPluginOperations.unsetBuildCmdPathInPreferences;
 
-import com.automation.remarks.junit5.Video;
+import io.openliberty.tools.junit5.LTEVideo;
 
 import java.io.File;
 import java.io.IOException;
@@ -416,7 +416,7 @@ public class LibertyPluginSWTBotGradleTest extends AbstractLibertyPluginSWTBotTe
      * Tests the debug with parameters menu action on a dashboard listed application.
      */
     @Test
-    @Video
+    @LTEVideo
     public void testDashboardDebugWithCustomConfigAction() {
 
         // Delete any previously created configs.
