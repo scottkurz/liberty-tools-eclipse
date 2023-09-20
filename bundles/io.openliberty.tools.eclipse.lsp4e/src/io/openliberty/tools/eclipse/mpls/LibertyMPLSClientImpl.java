@@ -57,7 +57,6 @@ import org.eclipse.lsp4mp.jdt.core.MicroProfileCorePlugin;
 import org.eclipse.lsp4mp.jdt.core.ProjectLabelManager;
 import org.eclipse.lsp4mp.jdt.core.PropertiesManager;
 import org.eclipse.lsp4mp.jdt.core.PropertiesManagerForJava;
-import org.eclipse.lsp4mp.jdt.internal.core.ls.JDTUtilsLSImpl;
 import org.eclipse.lsp4mp.ls.api.MicroProfileLanguageClientAPI;
 import org.eclipse.lsp4mp.ls.api.MicroProfileLanguageServerAPI;
 
@@ -89,7 +88,7 @@ public class LibertyMPLSClientImpl extends LanguageClientImpl implements MicroPr
         return CompletableFutures.computeAsync((cancelChecker) -> {
             final MicroProfileProjectInfo[] projectInfo = new MicroProfileProjectInfo[1];
             Job job = Job.create("MicroProfile properties collector", (ICoreRunnable) monitor -> {
-                projectInfo[0] = PropertiesManager.getInstance().getMicroProfileProjectInfo(params, JDTUtilsLSImpl.getInstance(), monitor);
+                projectInfo[0] = PropertiesManager.getInstance().getMicroProfileProjectInfo(params, JDTUtilsLTEImpl.getInstance(), monitor);
             });
             job.schedule();
             try {
@@ -123,7 +122,7 @@ public class LibertyMPLSClientImpl extends LanguageClientImpl implements MicroPr
         return CompletableFutures.computeAsync((cancelChecker) -> {
             IProgressMonitor monitor = getProgressMonitor(cancelChecker);
             try {
-                return PropertiesManagerForJava.getInstance().codeLens(javaParams, JDTUtilsLSImpl.getInstance(), monitor);
+                return PropertiesManagerForJava.getInstance().codeLens(javaParams, JDTUtilsLTEImpl.getInstance(), monitor);
             } catch (JavaModelException e) {
                 LibertyToolsLSPlugin.logException(e.getLocalizedMessage(), e);
                 return Collections.emptyList();
@@ -136,7 +135,7 @@ public class LibertyMPLSClientImpl extends LanguageClientImpl implements MicroPr
         return CompletableFutures.computeAsync((cancelChecker) -> {
             IProgressMonitor monitor = getProgressMonitor(cancelChecker);
             try {
-                return PropertiesManagerForJava.getInstance().diagnostics(javaParams, JDTUtilsLSImpl.getInstance(), monitor);
+                return PropertiesManagerForJava.getInstance().diagnostics(javaParams, JDTUtilsLTEImpl.getInstance(), monitor);
             } catch (JavaModelException e) {
                 LibertyToolsLSPlugin.logException(e.getLocalizedMessage(), e);
                 return Collections.emptyList();
@@ -149,7 +148,7 @@ public class LibertyMPLSClientImpl extends LanguageClientImpl implements MicroPr
         return CompletableFutures.computeAsync((cancelChecker) -> {
             IProgressMonitor monitor = getProgressMonitor(cancelChecker);
             try {
-                return (List<CodeAction>) PropertiesManagerForJava.getInstance().codeAction(javaParams, JDTUtilsLSImpl.getInstance(),
+                return (List<CodeAction>) PropertiesManagerForJava.getInstance().codeAction(javaParams, JDTUtilsLTEImpl.getInstance(),
                         monitor);
             } catch (JavaModelException e) {
                 LibertyToolsLSPlugin.logException(e.getLocalizedMessage(), e);
@@ -170,7 +169,7 @@ public class LibertyMPLSClientImpl extends LanguageClientImpl implements MicroPr
     public CompletableFuture<ProjectLabelInfoEntry> getJavaProjectLabels(MicroProfileJavaProjectLabelsParams javaParams) {
         return CompletableFutures.computeAsync((cancelChecker) -> {
             IProgressMonitor monitor = getProgressMonitor(cancelChecker);
-            return ProjectLabelManager.getInstance().getProjectLabelInfo(javaParams, JDTUtilsLSImpl.getInstance(), monitor);
+            return ProjectLabelManager.getInstance().getProjectLabelInfo(javaParams, JDTUtilsLTEImpl.getInstance(), monitor);
         });
     }
 
@@ -178,7 +177,7 @@ public class LibertyMPLSClientImpl extends LanguageClientImpl implements MicroPr
     public CompletableFuture<JavaFileInfo> getJavaFileInfo(MicroProfileJavaFileInfoParams javaParams) {
         return CompletableFutures.computeAsync(cancelChecker -> {
             IProgressMonitor monitor = getProgressMonitor(cancelChecker);
-            return PropertiesManagerForJava.getInstance().fileInfo(javaParams, JDTUtilsLSImpl.getInstance(), monitor);
+            return PropertiesManagerForJava.getInstance().fileInfo(javaParams, JDTUtilsLTEImpl.getInstance(), monitor);
         });
     }
 
@@ -187,7 +186,7 @@ public class LibertyMPLSClientImpl extends LanguageClientImpl implements MicroPr
         return CompletableFutures.computeAsync(cancelChecker -> {
             IProgressMonitor monitor = getProgressMonitor(cancelChecker);
             try {
-                return PropertiesManagerForJava.getInstance().definition(javaParams, JDTUtilsLSImpl.getInstance(), monitor);
+                return PropertiesManagerForJava.getInstance().definition(javaParams, JDTUtilsLTEImpl.getInstance(), monitor);
             } catch (JavaModelException e) {
                 LibertyToolsLSPlugin.logException(e.getLocalizedMessage(), e);
                 return null;
@@ -200,8 +199,8 @@ public class LibertyMPLSClientImpl extends LanguageClientImpl implements MicroPr
         return CompletableFutures.computeAsync(cancelChecker -> {
             IProgressMonitor monitor = getProgressMonitor(cancelChecker);
             try {
-                CompletionList completionList = PropertiesManagerForJava.getInstance().completion(javaParams, JDTUtilsLSImpl.getInstance(), monitor);
-                JavaCursorContextResult javaCursorContext = PropertiesManagerForJava.getInstance().javaCursorContext(javaParams, JDTUtilsLSImpl.getInstance(), monitor);               
+                CompletionList completionList = PropertiesManagerForJava.getInstance().completion(javaParams, JDTUtilsLTEImpl.getInstance(), monitor);
+                JavaCursorContextResult javaCursorContext = PropertiesManagerForJava.getInstance().javaCursorContext(javaParams, JDTUtilsLTEImpl.getInstance(), monitor);               
                 return new MicroProfileJavaCompletionResult(completionList, javaCursorContext); 
             } catch (JavaModelException e) {
                 LibertyToolsLSPlugin.logException(e.getLocalizedMessage(), e);
@@ -215,7 +214,7 @@ public class LibertyMPLSClientImpl extends LanguageClientImpl implements MicroPr
         return CompletableFutures.computeAsync((cancelChecker) -> {
             IProgressMonitor monitor = getProgressMonitor(cancelChecker);
             try {
-                return PropertiesManagerForJava.getInstance().hover(javaParams, JDTUtilsLSImpl.getInstance(), monitor);
+                return PropertiesManagerForJava.getInstance().hover(javaParams, JDTUtilsLTEImpl.getInstance(), monitor);
             } catch (JavaModelException e) {
                 LibertyToolsLSPlugin.logException(e.getLocalizedMessage(), e);
                 return null;
@@ -231,7 +230,7 @@ public class LibertyMPLSClientImpl extends LanguageClientImpl implements MicroPr
                 // Deserialize CodeAction#data which is a JSonObject to CodeActionResolveData
                 CodeActionResolveData resolveData = JSONUtility.toModel(unresolved.getData(), CodeActionResolveData.class);
                 unresolved.setData(resolveData);
-                return PropertiesManagerForJava.getInstance().resolveCodeAction(unresolved, JDTUtilsLSImpl.getInstance(), monitor);
+                return PropertiesManagerForJava.getInstance().resolveCodeAction(unresolved, JDTUtilsLTEImpl.getInstance(), monitor);
             } catch (JavaModelException e) {
                 LibertyToolsLSPlugin.logException(e.getLocalizedMessage(), e);
                 return null;
