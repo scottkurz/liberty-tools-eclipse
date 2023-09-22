@@ -42,4 +42,5 @@ Import-Package: com.automation.remarks.video;version="2.0.0",
  org.mockito,
  org.mockito.junit.jupiter,
  org.mockito.stubbing,
+ org.monte.media,
  org.osgi.service.prefs
