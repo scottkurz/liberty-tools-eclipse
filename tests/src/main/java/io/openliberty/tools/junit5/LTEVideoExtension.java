@@ -27,7 +27,6 @@ import org.monte.media.FormatKeys;
 import org.monte.media.FormatKeys.MediaType;
 import org.monte.media.math.Rational;
 
-import com.automation.remarks.video.RecordingUtils;
 import com.automation.remarks.video.enums.RecorderType;
 import com.automation.remarks.video.enums.RecordingMode;
 import com.automation.remarks.video.enums.VideoSaveMode;
@@ -41,7 +40,7 @@ public class LTEVideoExtension implements BeforeTestExecutionCallback, AfterTest
 
 	@Override
 	public void beforeTestExecution(ExtensionContext context) throws Exception {
-		if (!videoEnabled(context.getTestMethod().get())) {
+		if (!isVideoEnabled(context.getTestMethod().get())) {
 			return;
 		}
 
