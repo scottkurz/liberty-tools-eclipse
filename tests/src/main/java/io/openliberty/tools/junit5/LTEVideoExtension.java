@@ -95,6 +95,7 @@ public class LTEVideoExtension implements BeforeTestExecutionCallback, AfterTest
 				.build();
 
 		System.out.println("SKSK: recorder =" + recorder);
+		recorder.start();
 	}
 
 	class VideoConfigurationImpl implements VideoConfiguration {
