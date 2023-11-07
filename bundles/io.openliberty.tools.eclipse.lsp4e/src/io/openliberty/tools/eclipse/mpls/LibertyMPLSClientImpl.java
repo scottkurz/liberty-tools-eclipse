@@ -16,6 +16,8 @@
  */
 package io.openliberty.tools.eclipse.mpls;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -27,6 +29,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.lsp4e.LanguageClientImpl;
 import org.eclipse.lsp4j.CodeAction;
+import org.eclipse.lsp4j.CodeActionKind;
 import org.eclipse.lsp4j.CodeLens;
 import org.eclipse.lsp4j.CompletionList;
 import org.eclipse.lsp4j.Diagnostic;
@@ -166,6 +169,7 @@ public class LibertyMPLSClientImpl extends LanguageClientImpl implements MicroPr
                     return Collections.emptyList();
                 }
 
+                javaParams.getContext().setOnly(Arrays.asList(CodeActionKind.QuickFix));
                 return (List<CodeAction>) PropertiesManagerForJava.getInstance().codeAction(javaParams, JDTUtilsLSImpl.getInstance(),
                         monitor);
             } catch (JavaModelException e) {
