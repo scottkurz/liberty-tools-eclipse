@@ -484,10 +484,9 @@ public class DebugModeHandler {
      */
     private Path getServerEnvFile(Project project) throws Exception {
 
-        Project serverProj = getLibertyServerProject(project);
-        String projectPath = serverProj.getPath();
+    
 
-        Path libertyPluginConfigXmlPath = devModeOps.getLibertyPluginConfigXmlPath(projectPath);
+        Path libertyPluginConfigXmlPath = devModeOps.getLibertyPluginConfigXmlPath(project);
 
         // Read server.env path from liberty-plugin-config.xml
 
@@ -596,30 +595,6 @@ public class DebugModeHandler {
                 + ".  If the server starts later you might try to manually connect the debugger from the launch in the Debug view  You can confirm the debug port used in the console output looking for a message like  'Liberty debug port: [ 63624 ]'.");
     }
 
-    /**
-     * Returns the liberty server module project associated with the input project.
-     * 
-     * @param project The project to process.
-     * 
-     * @return The liberty server module project associated with the input project.
-     * 
-     * @throws Exception
-     */
-    private Project getLibertyServerProject(Project project) throws Exception {
-        if (project.isParentOfServerModule()) {
-            List<Project> mmps = project.getChildLibertyServerProjects();
-            switch (mmps.size()) {
-                case 0:
-                    throw new Exception("Unable to find a child project that contains the Liberty server configuration.");
-                case 1:
-                    return mmps.get(0);
-                default:
-                    throw new Exception("Multiple child projects containing Liberty server configuration were found.");
-            }
-        }
-
-        return project;
-    }
 
     private class DataHolder {
         boolean started;
